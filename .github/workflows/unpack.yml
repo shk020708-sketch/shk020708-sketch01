@@ -1,0 +1,44 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Android project
+        run: |
+          rm -rf build_src
+          mkdir build_src
+          unzip -q "保质期管家_V1.0_可云端构建.zip" -d build_src
+
+          PROJECT_DIR=$(find build_src -name gradlew -type f -print -quit | xargs -r dirname)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "找不到 gradlew，ZIP 可能不是有效的 Android 工程"
+            find build_src -maxdepth 3 -type f | head -100
+            exit 1
+          fi
+
+          echo "工程目录：$PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR"
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BaoZhiQi-debug-apk
+          path: "**/build/outputs/apk/**/*.apk"
