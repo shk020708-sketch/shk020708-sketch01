@@ -29,7 +29,7 @@ jobs:
         run: |
           rm -rf build_src
           mkdir -p build_src
-          unzip -q "保质期管家_V1.0_已修复JVM兼容性.zip" -d build_src
+          unzip -q "保质期管家_V1.0_状态栏自适应版.zip" -d build_src
 
           echo "解压后的文件："
           find build_src -maxdepth 3 -type f | head -100
